@@ -35,6 +35,25 @@ Denon AVR-X3800H, WiiM Ultra, Apple TV/Qobuz, radio, podcasts, stores Somfy et l
 - Dans l'app : ⚙️ → IP du Homey + clé, IP du Denon / WiiM, choisir le lecteur radio, attribuer un Flow à chaque bouton.
 - Les radios proposées (RTS La 1ère, Couleur 3, Option Musique, Espace 2) sont des adresses SRG SSR **à vérifier**. Les podcasts s'ajoutent avec leur adresse RSS.
 
+## Widgets et Siri
+
+### Mise en place dans Xcode
+1. *File → New → Target → Widget Extension*, nom `MaisonFacileWidget` (décocher « Configuration App Intent » et « Live Activity »). Remplacer le fichier généré par `MaisonFacileWidget/MaisonFacileWidget.swift`.
+2. Sélectionner tous les fichiers de `MaisonFacile/Shared/` → inspecteur → *Target Membership* : cocher **MaisonFacile** et **MaisonFacileWidget**.
+3. Dans les **deux** cibles : *Signing & Capabilities → + App Groups* → `group.ch.barlouka.maisonfacile` (ou un autre identifiant, à reporter dans `AppGroup.id` de `Config.swift`).
+4. Dans l'onglet *Info* de la cible widget, ajouter les mêmes clés que l'app (réseau local, `Allow Local Networking`).
+5. Pour que Siri comprenne les phrases en français : projet → *Info → Localizations* → mettre **French** comme langue de développement.
+
+### Ce que ça donne
+- **Widget Maison** (petit, moyen, grand) : les boutons de l'accueil, les radios favorites, pause/lecture et volume, utilisables directement depuis l'écran d'accueil, sans ouvrir l'app.
+- **Écran verrouillé** : un bouton rond « Pause musique ».
+- **Siri** : « Dis Siri, Soirée avec Maison Facile », « Dis Siri, mets Couleur 3 avec Maison Facile », « Dis Siri, pause avec Maison Facile ». Les mêmes actions sont dans l'app Raccourcis (automatisations possibles).
+
+Les réglages sont maintenant stockés dans le groupe d'apps ; les anciens réglages sont relus automatiquement la première fois.
+
+## En cours de lecture
+La barre du bas affiche le titre, l'artiste et la pochette (Denon via HEOS, WiiM via son API), mis à jour toutes les 5 secondes. L'horloge au repos de l'iPad affiche aussi le morceau en cours.
+
 ## Sur iPad (télécommande du salon)
 - Dans Xcode, cible → *General → Supported Destinations* : ajouter **iPad**.
 - Sur iPad, l'accueil affiche une grande grille de boutons, avec les stores et lumières toujours visibles à droite.
@@ -48,13 +67,14 @@ Denon AVR-X3800H, WiiM Ultra, Apple TV/Qobuz, radio, podcasts, stores Somfy et l
 ```
 MaisonFacile/
 ├── MaisonFacileApp.swift
-├── Models/    Config (réglages sauvegardés), AppModel (état + actions)
-├── Services/  HomeyClient (API locale), HeosClient (Denon, TCP 1255),
-│              WiimClient (API HTTP LinkPlay), PodcastService (RSS)
-└── Views/     Accueil, Radio, Podcasts, Lumières & stores, Réglages
+├── Shared/    (app + widget) Config, HomeyClient, HeosClient (Denon, TCP 1255),
+│              WiimClient (API LinkPlay), AudioPlayer, Intents (widgets/Siri)
+├── Models/    AppModel (état + actions)
+├── Services/  PodcastService (RSS), IdleController (repos iPad), Shortcuts (Siri)
+└── Views/     Accueil, Radio, Podcasts, Lumières & stores, Réglages, Horloge
+MaisonFacileWidget/  Widget Maison + bouton pause écran verrouillé
 ```
 
 ## Pistes suivantes
 - Mettre la clé API dans le Trousseau (Keychain) plutôt que dans UserDefaults.
 - Widgets et Raccourcis (App Intents) pour lancer « Radio » ou « Tout éteindre » depuis l'écran verrouillé.
-- Afficher le titre en cours (HEOS `get_now_playing_media`, WiiM `getPlayerStatus`).

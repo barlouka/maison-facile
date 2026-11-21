@@ -43,6 +43,7 @@ struct HomeView: View {
         }
         .overlay(alignment: .top) { ToastView(text: model.toast) }
         .task { await model.refreshVolume() }
+        .task { await model.pollNowPlaying() }
     }
 
     private var tiles: some View {
@@ -94,6 +95,15 @@ struct VolumeBar: View {
     @EnvironmentObject var model: AppModel
 
     var body: some View {
+        VStack(spacing: 10) {
+            if let np = model.nowPlaying { NowPlayingRow(np: np) }
+            controls
+        }
+        .padding()
+        .background(.ultraThinMaterial)
+    }
+
+    private var controls: some View {
         HStack(spacing: 14) {
             Button { Task { await model.togglePause() } } label: {
                 Image(systemName: model.isPlaying ? "pause.fill" : "play.fill")
@@ -109,8 +119,32 @@ struct VolumeBar: View {
                 Image(systemName: "speaker.plus.fill").font(.title2)
             }
         }
-        .padding()
-        .background(.ultraThinMaterial)
+    }
+}
+
+struct NowPlayingRow: View {
+    let np: NowPlaying
+    var body: some View {
+        HStack(spacing: 12) {
+            AsyncImage(url: np.artworkURL) { img in
+                img.resizable().scaledToFill()
+            } placeholder: {
+                Image(systemName: "music.note").font(.title2).foregroundStyle(.secondary)
+            }
+            .frame(width: 52, height: 52)
+            .background(.quaternary)
+            .clipShape(RoundedRectangle(cornerRadius: 8))
+            VStack(alignment: .leading, spacing: 2) {
+                Text(np.title).font(.headline).lineLimit(1)
+                if !np.artist.isEmpty {
+                    Text(np.artist).font(.subheadline).foregroundStyle(.secondary).lineLimit(1)
+                }
+            }
+            Spacer()
+            if np.isPlaying {
+                Image(systemName: "waveform").symbolEffect(.variableColor.iterative).foregroundStyle(.tint)
+            }
+        }
     }
 }
 

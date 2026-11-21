@@ -1,25 +1,28 @@
 import SwiftUI
 
-enum ClockStyle: String, Codable, CaseIterable, Identifiable {
-    case digital = "Grands chiffres"
-    case analog = "Aiguilles"
-    var id: String { rawValue }
-}
-
 /// Écran de repos façon Apple Watch : fond noir, heure en grand.
 /// La position bouge légèrement chaque minute pour ménager l'écran.
 struct ClockView: View {
     let style: ClockStyle
+    var nowPlaying: NowPlaying?
 
     var body: some View {
         TimelineView(.periodic(from: .now, by: 1)) { ctx in
             let date = ctx.date
             ZStack {
                 Color.black.ignoresSafeArea()
-                Group {
+                VStack(spacing: 40) {
                     switch style {
                     case .digital: DigitalFace(date: date)
                     case .analog: AnalogFace(date: date).frame(width: 420, height: 420)
+                    }
+                    if let np = nowPlaying, np.isPlaying {
+                        Label(np.artist.isEmpty ? np.title : "\(np.title) · \(np.artist)",
+                              systemImage: "music.note")
+                            .font(.system(size: 26, weight: .medium, design: .rounded))
+                            .foregroundStyle(.white.opacity(0.6))
+                            .lineLimit(1)
+                            .frame(maxWidth: 700)
                     }
                 }
                 .offset(drift(for: date))

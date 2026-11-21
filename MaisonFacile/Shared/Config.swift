@@ -1,4 +1,13 @@
 import Foundation
+#if canImport(WidgetKit)
+import WidgetKit
+#endif
+
+/// Identifiant du groupe d'apps partagé entre l'app et le widget (à adapter à ton Team).
+enum AppGroup {
+    static let id = "group.ch.barlouka.maisonfacile"
+    static var defaults: UserDefaults { UserDefaults(suiteName: id) ?? .standard }
+}
 
 /// Un gros bouton de l'écran d'accueil qui lance un Flow Homey.
 struct Tile: Codable, Identifiable, Hashable {
@@ -24,6 +33,12 @@ struct PodcastFeed: Codable, Identifiable, Hashable {
 }
 
 /// Appareil qui lit la radio et les podcasts.
+enum ClockStyle: String, Codable, CaseIterable, Identifiable {
+    case digital = "Grands chiffres"
+    case analog = "Aiguilles"
+    var id: String { rawValue }
+}
+
 enum PlayerKind: String, Codable, CaseIterable, Identifiable {
     case denon = "Denon (HEOS)"
     case wiim = "WiiM Ultra"
@@ -52,14 +67,30 @@ struct Config: Codable, Equatable {
 
     private static let key = "MaisonFacile.config"
 
+    /// Les réglages vivent dans le groupe d'apps pour que le widget et Siri les lisent.
     static func load() -> Config {
-        guard let data = UserDefaults.standard.data(forKey: key),
-              let c = try? JSONDecoder().decode(Config.self, from: data) else { return Config() }
+        let data = AppGroup.defaults.data(forKey: key)
+            ?? UserDefaults.standard.data(forKey: key)   // anciens réglages (avant le widget)
+        guard let data, let c = try? JSONDecoder().decode(Config.self, from: data) else { return Config() }
         return c
     }
 
     static func save(_ c: Config) {
-        if let data = try? JSONEncoder().encode(c) { UserDefaults.standard.set(data, forKey: key) }
+        guard let data = try? JSONEncoder().encode(c) else { return }
+        AppGroup.defaults.set(data, forKey: key)
+        #if canImport(WidgetKit)
+        WidgetCenter.shared.reloadAllTimelines()
+        #endif
+    }
+
+    var homeyClient: HomeyClient? { HomeyClient(ip: homeyIP, token: homeyToken) }
+
+    /// Nouveau client pour le lecteur choisi (utilisé par le widget et Siri).
+    func makePlayer() -> AudioPlayer? {
+        switch player {
+        case .denon: return denonIP.isEmpty ? nil : HeosClient(host: denonIP)
+        case .wiim: return wiimIP.isEmpty ? nil : WiimClient(host: wiimIP)
+        }
     }
 }
 

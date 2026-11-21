@@ -11,7 +11,7 @@ struct MaisonFacileApp: App {
                 .environmentObject(model)
                 .overlay {
                     if idle.isResting {
-                        ClockView(style: model.config.clockStyle ?? .digital)
+                        ClockView(style: model.config.clockStyle ?? .digital, nowPlaying: model.nowPlaying)
                             .transition(.opacity)
                     }
                 }

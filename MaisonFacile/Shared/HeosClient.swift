@@ -51,6 +51,22 @@ actor HeosClient: AudioPlayer {
         return level ?? 0
     }
 
+    func nowPlaying() async throws -> NowPlaying? {
+        let p = try await playerID()
+        let state = try await command("player/get_play_state", ["pid": "\(p)"])
+        let media = try await command("player/get_now_playing_media", ["pid": "\(p)"])
+        guard let data = media.payload,
+              let obj = try JSONSerialization.jsonObject(with: data) as? [String: Any] else { return nil }
+        func text(_ k: String) -> String { (obj[k] as? String)?.removingPercentEncoding ?? "" }
+        let song = text("song"), station = text("station")
+        let title = song.isEmpty ? station : song
+        guard !title.isEmpty else { return nil }
+        let artist = text("artist").isEmpty && !song.isEmpty ? station : text("artist")
+        return NowPlaying(title: title, artist: artist,
+                          artworkURL: URL(string: text("image_url")),
+                          isPlaying: state.message.contains("state=play"))
+    }
+
     func playPreset(_ n: Int) async throws {
         let p = try await playerID()
         try await command("browse/play_preset", ["pid": "\(p)", "preset": "\(n)"])

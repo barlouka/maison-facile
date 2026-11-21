@@ -13,6 +13,7 @@ final class AppModel: ObservableObject {
     @Published var toast: String?
     @Published var volume: Double = 30
     @Published var isPlaying = false
+    @Published var nowPlaying: NowPlaying?
 
     private var heosStore: HeosClient?
     private var wiimStore: WiimClient?
@@ -67,6 +68,8 @@ final class AppModel: ObservableObject {
             try await player.playURL(url)
             isPlaying = true
             show("▶︎ \(title)")
+            try? await Task.sleep(for: .seconds(2))
+            await refreshNowPlaying()
         } catch {
             show("Le lecteur ne répond pas")
         }
@@ -78,6 +81,21 @@ final class AppModel: ObservableObject {
             if isPlaying { try await player.pause() } else { try await player.resume() }
             isPlaying.toggle()
         } catch { show("Le lecteur ne répond pas") }
+    }
+
+    /// Met à jour « en cours de lecture » toutes les 5 secondes tant que la vue est affichée.
+    func pollNowPlaying() async {
+        while !Task.isCancelled {
+            await refreshNowPlaying()
+            try? await Task.sleep(for: .seconds(5))
+        }
+    }
+
+    func refreshNowPlaying() async {
+        guard let player else { nowPlaying = nil; return }
+        let np = try? await player.nowPlaying()
+        nowPlaying = np
+        if let np { isPlaying = np.isPlaying }
     }
 
     func refreshVolume() async {
