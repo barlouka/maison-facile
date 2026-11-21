@@ -4,11 +4,17 @@ struct LightsBlindsView: View {
     @EnvironmentObject var model: AppModel
     @State private var devices: [HomeyDevice] = []
     @State private var loading = true
+    /// false quand la vue est intégrée à l'accueil iPad
+    var showsTitle = true
 
     private var blinds: [HomeyDevice] { devices.filter(\.isBlind) }
     private var lights: [HomeyDevice] { devices.filter(\.isLight) }
 
     var body: some View {
+        if showsTitle { content.navigationTitle("Lumières & stores") } else { content }
+    }
+
+    private var content: some View {
         List {
             if !blinds.isEmpty {
                 Section("Stores") {
@@ -29,7 +35,6 @@ struct LightsBlindsView: View {
                                        description: Text("Vérifie l'adresse et la clé dans les Réglages."))
             }
         }
-        .navigationTitle("Lumières & stores")
         .refreshable { await load() }
         .task { await load() }
     }

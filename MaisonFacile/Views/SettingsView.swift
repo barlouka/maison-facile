@@ -14,6 +14,14 @@ struct SettingsView: View {
                 Button("Charger les Flows") { Task { await loadFlows() } }
             }
 
+            Section {
+                Toggle("Mode télécommande (écran toujours allumé)", isOn: Binding(
+                    get: { model.config.keepAwake ?? false },
+                    set: { model.config.keepAwake = $0 }))
+            } footer: {
+                Text("Pour un iPad posé au salon. Avec l'Accès guidé (Réglages iPad → Accessibilité), il reste sur l'app.")
+            }
+
             Section("Audio") {
                 TextField("IP du Denon AVR-X3800H", text: $model.config.denonIP)
                     .keyboardType(.numbersAndPunctuation)

@@ -41,6 +41,8 @@ struct Config: Codable {
     var scenes: [Tile] = Tile.defaults
     var stations: [RadioStation] = RadioStation.defaults
     var podcasts: [PodcastFeed] = []
+    /// Mode télécommande : l'écran ne se met jamais en veille (optionnel pour rester compatible avec les anciens réglages)
+    var keepAwake: Bool?
 
     private static let key = "MaisonFacile.config"
 

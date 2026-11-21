@@ -35,6 +35,12 @@ Denon AVR-X3800H, WiiM Ultra, Apple TV/Qobuz, radio, podcasts, stores Somfy et l
 - Dans l'app : ⚙️ → IP du Homey + clé, IP du Denon / WiiM, choisir le lecteur radio, attribuer un Flow à chaque bouton.
 - Les radios proposées (RTS La 1ère, Couleur 3, Option Musique, Espace 2) sont des adresses SRG SSR **à vérifier**. Les podcasts s'ajoutent avec leur adresse RSS.
 
+## Sur iPad (télécommande du salon)
+- Dans Xcode, cible → *General → Supported Destinations* : ajouter **iPad**.
+- Sur iPad, l'accueil affiche une grande grille de boutons, avec les stores et lumières toujours visibles à droite.
+- Réglages de l'app → **Mode télécommande** : l'écran ne se met plus en veille (iPad branché sur son support).
+- Pour bloquer l'iPad sur l'app : Réglages iPad → Accessibilité → **Accès guidé**, puis triple-clic sur le bouton latéral.
+
 ## Structure
 
 ```
@@ -50,4 +56,3 @@ MaisonFacile/
 - Mettre la clé API dans le Trousseau (Keychain) plutôt que dans UserDefaults.
 - Widgets et Raccourcis (App Intents) pour lancer « Radio » ou « Tout éteindre » depuis l'écran verrouillé.
 - Afficher le titre en cours (HEOS `get_now_playing_media`, WiiM `getPlayerStatus`).
-- Version Apple TV / iPad en mode « télécommande ».

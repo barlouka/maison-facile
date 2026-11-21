@@ -5,29 +5,24 @@ enum Destination: Hashable { case radio, podcasts, lightsBlinds, settings }
 struct HomeView: View {
     @EnvironmentObject var model: AppModel
     @Environment(\.openURL) private var openURL
+    @Environment(\.horizontalSizeClass) private var sizeClass
     @State private var path: [Destination] = []
 
-    private let columns = [GridItem(.flexible(), spacing: 16), GridItem(.flexible(), spacing: 16)]
+    private var isTablet: Bool { sizeClass == .regular }
+    private var columns: [GridItem] {
+        [GridItem(.adaptive(minimum: isTablet ? 200 : 150), spacing: isTablet ? 24 : 16)]
+    }
 
     var body: some View {
         NavigationStack(path: $path) {
-            ScrollView {
-                LazyVGrid(columns: columns, spacing: 16) {
-                    ForEach(model.config.scenes) { tile in
-                        BigTile(title: tile.title, symbol: tile.symbol, color: .accentColor) {
-                            Task {
-                                let ok = await model.run(tile)
-                                if ok, let s = tile.openURL, let u = URL(string: s) { openURL(u) }
-                            }
-                        }
-                    }
-                    BigTile(title: "Radio", symbol: "radio.fill", color: .orange) { path.append(.radio) }
-                    BigTile(title: "Podcasts", symbol: "mic.fill", color: .purple) { path.append(.podcasts) }
-                    BigTile(title: "Lumières & stores", symbol: "blinds.horizontal.closed", color: .teal) {
-                        path.append(.lightsBlinds)
-                    }
+            HStack(spacing: 0) {
+                tiles
+                if isTablet {
+                    Divider()
+                    // Sur iPad : stores et lumières toujours visibles à droite
+                    LightsBlindsView(showsTitle: false)
+                        .frame(width: 400)
                 }
-                .padding()
             }
             .safeAreaInset(edge: .bottom) { VolumeBar() }
             .navigationTitle("Maison")
@@ -48,6 +43,35 @@ struct HomeView: View {
         }
         .overlay(alignment: .top) { ToastView(text: model.toast) }
         .task { await model.refreshVolume() }
+        .onAppear { applyKeepAwake() }
+        .onChange(of: model.config.keepAwake) { applyKeepAwake() }
+    }
+
+    private func applyKeepAwake() {
+        UIApplication.shared.isIdleTimerDisabled = model.config.keepAwake ?? false
+    }
+
+    private var tiles: some View {
+            ScrollView {
+                LazyVGrid(columns: columns, spacing: isTablet ? 24 : 16) {
+                    ForEach(model.config.scenes) { tile in
+                        BigTile(title: tile.title, symbol: tile.symbol, color: .accentColor, large: isTablet) {
+                            Task {
+                                let ok = await model.run(tile)
+                                if ok, let s = tile.openURL, let u = URL(string: s) { openURL(u) }
+                            }
+                        }
+                    }
+                    BigTile(title: "Radio", symbol: "radio.fill", color: .orange, large: isTablet) { path.append(.radio) }
+                    BigTile(title: "Podcasts", symbol: "mic.fill", color: .purple, large: isTablet) { path.append(.podcasts) }
+                    if !isTablet {
+                        BigTile(title: "Lumières & stores", symbol: "blinds.horizontal.closed", color: .teal) {
+                            path.append(.lightsBlinds)
+                        }
+                    }
+                }
+                .padding(isTablet ? 24 : 16)
+            }
     }
 }
 
@@ -55,15 +79,16 @@ struct BigTile: View {
     let title: String
     let symbol: String
     let color: Color
+    var large = false
     let action: () -> Void
 
     var body: some View {
         Button(action: action) {
             VStack(spacing: 12) {
-                Image(systemName: symbol).font(.system(size: 40, weight: .semibold))
-                Text(title).font(.title3.bold()).multilineTextAlignment(.center)
+                Image(systemName: symbol).font(.system(size: large ? 56 : 40, weight: .semibold))
+                Text(title).font(large ? .title.bold() : .title3.bold()).multilineTextAlignment(.center)
             }
-            .frame(maxWidth: .infinity, minHeight: 130)
+            .frame(maxWidth: .infinity, minHeight: large ? 180 : 130)
             .foregroundStyle(.white)
             .background(color.gradient, in: RoundedRectangle(cornerRadius: 24))
         }
