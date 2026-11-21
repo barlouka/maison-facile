@@ -12,15 +12,14 @@ Denon AVR-X3800H, WiiM Ultra, Apple TV/Qobuz, radio, podcasts, stores Somfy et l
 
 ## Mise en route
 
-### 1. Créer le projet Xcode
-1. Xcode → *New Project* → iOS **App**, nom `MaisonFacile`, interface SwiftUI, iOS 17 minimum.
-2. Supprimer `ContentView.swift` et le fichier `MaisonFacileApp.swift` généré.
-3. Glisser le dossier `MaisonFacile/` (Models, Services, Views, MaisonFacileApp.swift) dans le projet (« Create groups »).
-4. Onglet **Info** de la cible, ajouter :
-   - `Privacy - Local Network Usage Description` (NSLocalNetworkUsageDescription) : « Pour piloter l'ampli, le WiiM et le Homey de la maison. »
-   - `App Transport Security Settings` → `Allow Local Networking` = YES (NSAllowsLocalNetworking).
+### 1. Ouvrir le projet
+Le projet Xcode est prêt : `MaisonFacile.xcodeproj` (Xcode 16 ou plus récent). Les dossiers `MaisonFacile/`, `Shared/` et `MaisonFacileWidget/` sont synchronisés : tout fichier ajouté dedans est pris en compte automatiquement.
 
-   (Le fichier `Info-additions.plist` contient ces clés à copier.)
+1. Ouvrir `MaisonFacile.xcodeproj`.
+2. Cibles **MaisonFacile** et **MaisonFacileWidget** → *Signing & Capabilities* → choisir ton **Team**. Xcode crée les identifiants et le groupe d'apps.
+3. Brancher l'iPhone ou l'iPad, choisir le schéma **MaisonFacile**, puis ▶︎.
+
+Déjà réglé dans le projet : iPhone + iPad, iOS 17, réseau local (`Config/*.plist`), App Group `group.ch.barlouka.maisonfacile` (`Config/*.entitlements`), langue de développement français (pour Siri).
 
 ### 2. Homey Pro
 - App web Homey → **Réglages → Clés API → Nouvelle clé** : cocher au minimum *Flows* (lancer) et *Appareils* (contrôler). Copier la clé.
@@ -36,13 +35,6 @@ Denon AVR-X3800H, WiiM Ultra, Apple TV/Qobuz, radio, podcasts, stores Somfy et l
 - Les radios proposées (RTS La 1ère, Couleur 3, Option Musique, Espace 2) sont des adresses SRG SSR **à vérifier**. Les podcasts s'ajoutent avec leur adresse RSS.
 
 ## Widgets et Siri
-
-### Mise en place dans Xcode
-1. *File → New → Target → Widget Extension*, nom `MaisonFacileWidget` (décocher « Configuration App Intent » et « Live Activity »). Remplacer le fichier généré par `MaisonFacileWidget/MaisonFacileWidget.swift`.
-2. Sélectionner tous les fichiers de `MaisonFacile/Shared/` → inspecteur → *Target Membership* : cocher **MaisonFacile** et **MaisonFacileWidget**.
-3. Dans les **deux** cibles : *Signing & Capabilities → + App Groups* → `group.ch.barlouka.maisonfacile` (ou un autre identifiant, à reporter dans `AppGroup.id` de `Config.swift`).
-4. Dans l'onglet *Info* de la cible widget, ajouter les mêmes clés que l'app (réseau local, `Allow Local Networking`).
-5. Pour que Siri comprenne les phrases en français : projet → *Info → Localizations* → mettre **French** comme langue de développement.
 
 ### Ce que ça donne
 - **Widget Maison** (petit, moyen, grand) : les boutons de l'accueil, les radios favorites, pause/lecture et volume, utilisables directement depuis l'écran d'accueil, sans ouvrir l'app.
@@ -66,8 +58,8 @@ La barre du bas affiche le titre, l'artiste et la pochette (Denon via HEOS, WiiM
 
 ```
 MaisonFacile/
-├── MaisonFacileApp.swift
-├── Shared/    (app + widget) Config, HomeyClient, HeosClient (Denon, TCP 1255),
+├── MaisonFacileApp.swift, Assets.xcassets
+Shared/        (app + widget) Config, HomeyClient, HeosClient (Denon, TCP 1255),
 │              WiimClient (API LinkPlay), AudioPlayer, Intents (widgets/Siri)
 ├── Models/    AppModel (état + actions)
 ├── Services/  PodcastService (RSS), IdleController (repos iPad), Shortcuts (Siri)
