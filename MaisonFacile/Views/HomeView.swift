@@ -43,12 +43,6 @@ struct HomeView: View {
         }
         .overlay(alignment: .top) { ToastView(text: model.toast) }
         .task { await model.refreshVolume() }
-        .onAppear { applyKeepAwake() }
-        .onChange(of: model.config.keepAwake) { applyKeepAwake() }
-    }
-
-    private func applyKeepAwake() {
-        UIApplication.shared.isIdleTimerDisabled = model.config.keepAwake ?? false
     }
 
     private var tiles: some View {

@@ -18,8 +18,35 @@ struct SettingsView: View {
                 Toggle("Mode télécommande (écran toujours allumé)", isOn: Binding(
                     get: { model.config.keepAwake ?? false },
                     set: { model.config.keepAwake = $0 }))
-            } footer: {
-                Text("Pour un iPad posé au salon. Avec l'Accès guidé (Réglages iPad → Accessibilité), il reste sur l'app.")
+                if model.config.keepAwake ?? false {
+                    Toggle("Horloge au repos", isOn: Binding(
+                        get: { model.config.restClock ?? true },
+                        set: { model.config.restClock = $0 }))
+                    Picker("Après", selection: Binding(
+                        get: { model.config.restDelay ?? 60 },
+                        set: { model.config.restDelay = $0 })) {
+                        Text("30 secondes").tag(30)
+                        Text("1 minute").tag(60)
+                        Text("2 minutes").tag(120)
+                        Text("5 minutes").tag(300)
+                    }
+                    Picker("Cadran", selection: Binding(
+                        get: { model.config.clockStyle ?? .digital },
+                        set: { model.config.clockStyle = $0 })) {
+                        ForEach(ClockStyle.allCases) { Text($0.rawValue).tag($0) }
+                    }
+                    VStack(alignment: .leading) {
+                        Text("Luminosité au repos")
+                        Slider(value: Binding(
+                            get: { model.config.restBrightness ?? 0.15 },
+                            set: { model.config.restBrightness = $0 }), in: 0...0.6)
+                    }
+                    Toggle("Éteindre la nuit (23 h – 6 h)", isOn: Binding(
+                        get: { model.config.sleepAtNight ?? true },
+                        set: { model.config.sleepAtNight = $0 }))
+                }
+            } header: { Text("iPad du salon") } footer: {
+                Text("Au repos, l'iPad affiche l'heure sur fond noir avec une luminosité basse ; un toucher le réveille. La nuit, il se met en veille comme d'habitude. Avec l'Accès guidé (Réglages iPad → Accessibilité), il reste sur l'app.")
             }
 
             Section("Audio") {

@@ -30,7 +30,7 @@ enum PlayerKind: String, Codable, CaseIterable, Identifiable {
     var id: String { rawValue }
 }
 
-struct Config: Codable {
+struct Config: Codable, Equatable {
     var homeyIP = ""
     var homeyToken = ""          // clé API Homey (à terme : Trousseau)
     var denonIP = ""
@@ -43,6 +43,12 @@ struct Config: Codable {
     var podcasts: [PodcastFeed] = []
     /// Mode télécommande : l'écran ne se met jamais en veille (optionnel pour rester compatible avec les anciens réglages)
     var keepAwake: Bool?
+    // Repos de l'iPad (horloge + luminosité basse)
+    var restClock: Bool?
+    var restDelay: Int?          // secondes
+    var restBrightness: Double?  // 0…1
+    var clockStyle: ClockStyle?
+    var sleepAtNight: Bool?      // 23 h – 6 h : l'iPad se met en veille normalement
 
     private static let key = "MaisonFacile.config"
 

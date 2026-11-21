@@ -39,6 +39,8 @@ Denon AVR-X3800H, WiiM Ultra, Apple TV/Qobuz, radio, podcasts, stores Somfy et l
 - Dans Xcode, cible → *General → Supported Destinations* : ajouter **iPad**.
 - Sur iPad, l'accueil affiche une grande grille de boutons, avec les stores et lumières toujours visibles à droite.
 - Réglages de l'app → **Mode télécommande** : l'écran ne se met plus en veille (iPad branché sur son support).
+- **Horloge au repos** : après un délai sans toucher l'écran (30 s à 5 min), l'iPad affiche l'heure façon Apple Watch (grands chiffres ou aiguilles), fond noir, luminosité basse. Un toucher le réveille et rétablit la luminosité. L'horloge bouge un peu chaque minute pour ménager l'écran.
+- **La nuit (23 h – 6 h)**, si l'option est active, l'iPad se met en veille normalement pour économiser l'énergie.
 - Pour bloquer l'iPad sur l'app : Réglages iPad → Accessibilité → **Accès guidé**, puis triple-clic sur le bouton latéral.
 
 ## Structure
