@@ -27,6 +27,7 @@ Déjà réglé dans le projet : iPhone + iPad, iOS 17, réseau local (`Config/*.
   - **Qobuz** : Denon allumé, entrée HEOS/Online Music, volume 35. L'app ouvre ensuite Qobuz → bouton Connect → choisir le Denon (ou le WiiM).
   - **Apple TV** : Denon allumé sur l'entrée CBL/SAT. L'app lance ensuite le raccourci iOS **« Maison Apple TV »** (actions *Réveiller l'Apple TV* + *Afficher la télécommande*), qui allume l'Apple TV et ouvre la télécommande virtuelle d'iOS.
   - **Avant d'écouter** (optionnel, réglage « Flow avant d'écouter ») : allumer le Denon sur l'entrée du WiiM si le WiiM est branché sur l'ampli.
+  - **Vinyle** : Denon allumé sur Media Player et WiiM Ultra sur son entrée phono.
   - **Tout éteindre** : Denon en veille, lumières éteintes.
 
 ### 3. Appareils

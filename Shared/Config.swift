@@ -64,6 +64,7 @@ struct Config: Codable, Equatable {
     var restBrightness: Double?  // 0…1
     var clockStyle: ClockStyle?
     var sleepAtNight: Bool?      // 23 h – 6 h : l'iPad se met en veille normalement
+    var addedVinyl: Bool?        // migration : bouton Vinyle ajouté
 
     private static let key = "MaisonFacile.config"
 
@@ -75,6 +76,18 @@ struct Config: Codable, Equatable {
         // Anciens réglages : le bouton Apple TV ouvre désormais le raccourci (réveil + télécommande).
         for i in c.scenes.indices where c.scenes[i].title == "Apple TV" && c.scenes[i].openURL == nil {
             c.scenes[i].openURL = Tile.appleTVShortcutURL
+        }
+        // Boutons par défaut : Flow Homey prérempli s'il n'est pas encore choisi.
+        for i in c.scenes.indices where c.scenes[i].flowRef == nil {
+            c.scenes[i].flowRef = Tile.defaults.first { $0.title == c.scenes[i].title }?.flowRef
+        }
+        // Nouveau bouton Vinyle, ajouté une seule fois après Apple TV.
+        if !(c.addedVinyl ?? false) {
+            if !c.scenes.contains(where: { $0.title == "Vinyle" }), let vinyl = Tile.defaults.first(where: { $0.title == "Vinyle" }) {
+                let at = (c.scenes.firstIndex { $0.title == "Apple TV" }).map { $0 + 1 } ?? c.scenes.count
+                c.scenes.insert(vinyl, at: at)
+            }
+            c.addedVinyl = true
         }
         return c
     }
@@ -103,10 +116,13 @@ extension Tile {
     static let appleTVShortcutURL = "shortcuts://run-shortcut?name=Maison%20Apple%20TV"
 
     static let defaults: [Tile] = [
-        Tile(title: "Qobuz", symbol: "music.note", openURL: "https://open.qobuz.com/"),
-        Tile(title: "Apple TV", symbol: "appletv.fill", openURL: Tile.appleTVShortcutURL),
-        Tile(title: "Soirée", symbol: "lamp.floor.fill"),
-        Tile(title: "Tout éteindre", symbol: "power"),
+        Tile(title: "Qobuz", symbol: "music.note", flowRef: "flow/b0d6bca0-bd3e-4a35-810a-47a30fdd1ba4",
+             openURL: "https://open.qobuz.com/"),
+        Tile(title: "Apple TV", symbol: "appletv.fill", flowRef: "flow/6c81c481-7fbb-4abf-a3d3-b6ed08f3c93c",
+             openURL: Tile.appleTVShortcutURL),
+        Tile(title: "Vinyle", symbol: "opticaldisc.fill", flowRef: "flow/54204b7d-b30f-4e2d-8282-c42058e56fc0"),
+        Tile(title: "Soirée", symbol: "lamp.floor.fill", flowRef: "flow/b147e4de-8ffb-46ac-9855-dfcb94698200"),
+        Tile(title: "Tout éteindre", symbol: "power", flowRef: "flow/cd8aa4cb-6275-42a9-aac6-7013150ec00d"),
     ]
 }
 
