@@ -71,7 +71,11 @@ struct Config: Codable, Equatable {
     static func load() -> Config {
         let data = AppGroup.defaults.data(forKey: key)
             ?? UserDefaults.standard.data(forKey: key)   // anciens réglages (avant le widget)
-        guard let data, let c = try? JSONDecoder().decode(Config.self, from: data) else { return Config() }
+        guard let data, var c = try? JSONDecoder().decode(Config.self, from: data) else { return Config() }
+        // Anciens réglages : le bouton Apple TV ouvre désormais le raccourci (réveil + télécommande).
+        for i in c.scenes.indices where c.scenes[i].title == "Apple TV" && c.scenes[i].openURL == nil {
+            c.scenes[i].openURL = Tile.appleTVShortcutURL
+        }
         return c
     }
 
@@ -95,9 +99,12 @@ struct Config: Codable, Equatable {
 }
 
 extension Tile {
+    /// Raccourci iOS « Maison Apple TV » : réveille l'Apple TV puis affiche la télécommande.
+    static let appleTVShortcutURL = "shortcuts://run-shortcut?name=Maison%20Apple%20TV"
+
     static let defaults: [Tile] = [
         Tile(title: "Qobuz", symbol: "music.note", openURL: "https://open.qobuz.com/"),
-        Tile(title: "Apple TV", symbol: "appletv.fill"),
+        Tile(title: "Apple TV", symbol: "appletv.fill", openURL: Tile.appleTVShortcutURL),
         Tile(title: "Soirée", symbol: "lamp.floor.fill"),
         Tile(title: "Tout éteindre", symbol: "power"),
     ]

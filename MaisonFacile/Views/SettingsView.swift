@@ -67,6 +67,11 @@ struct SettingsView: View {
                         TextField("Nom", text: $tile.title).font(.headline)
                         TextField("Symbole SF", text: $tile.symbol).foregroundStyle(.secondary)
                         flowPicker("Flow", ref: $tile.flowRef)
+                        TextField("Ouvrir ensuite (URL ou raccourci)", text: Binding(
+                            get: { tile.openURL ?? "" },
+                            set: { tile.openURL = $0.isEmpty ? nil : $0 }))
+                            .textInputAutocapitalization(.never)
+                            .font(.caption)
                     }
                 }
                 .onDelete { model.config.scenes.remove(atOffsets: $0) }

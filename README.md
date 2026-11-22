@@ -25,7 +25,7 @@ Déjà réglé dans le projet : iPhone + iPad, iOS 17, réseau local (`Config/*.
 - App web Homey → **Réglages → Clés API → Nouvelle clé** : cocher au minimum *Flows* (lancer) et *Appareils* (contrôler). Copier la clé.
 - Créer un Flow par bouton, qui **commence par la carte « Ce Flow est démarré »** (sinon il ne peut pas être lancé par l'API). Exemples :
   - **Qobuz** : Denon allumé, entrée HEOS/Online Music, volume 35. L'app ouvre ensuite Qobuz → bouton Connect → choisir le Denon (ou le WiiM).
-  - **Apple TV** : Denon allumé sur l'entrée de l'Apple TV + réveil de l'Apple TV.
+  - **Apple TV** : Denon allumé sur l'entrée CBL/SAT. L'app lance ensuite le raccourci iOS **« Maison Apple TV »** (actions *Réveiller l'Apple TV* + *Afficher la télécommande*), qui allume l'Apple TV et ouvre la télécommande virtuelle d'iOS.
   - **Avant d'écouter** (optionnel, réglage « Flow avant d'écouter ») : allumer le Denon sur l'entrée du WiiM si le WiiM est branché sur l'ampli.
   - **Tout éteindre** : Denon en veille, lumières éteintes.
 
