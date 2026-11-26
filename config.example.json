@@ -52,8 +52,8 @@
   ],
   "podcasts": [
     {
-      "name": "Mon podcast",
-      "rss": "https://exemple.com/flux.xml"
+      "name": "Millie D. et Farfelu",
+      "rss": "https://feeds.audiomeans.fr/feed/d502f0bc-28d3-4bcf-9a93-7178f536e89c.xml"
     }
   ],
   "hue": {
