@@ -66,6 +66,7 @@ Puis `sudo reboot` : l'app démarre toute seule en plein écran.
 
 | Pour… | Commande |
 |---|---|
+| Écran en paysage (écran tactile 2) | `./paysage.sh` (ou `./paysage.sh 270` si à l'envers) |
 | Relancer l'app après un changement de `config.json` | `./lancer.sh` |
 | Voir les messages de l'app | `cat ~/.cache/maison-facile.log` |
 | Tester dans une fenêtre | `.venv/bin/python app.py --fenetre` |
