@@ -64,11 +64,14 @@ def decouvrir():
         return []
     print("Recherche des appareils sur le réseau (10 s)…")
     try:
-        out = subprocess.run(["avahi-browse", "-atrp"], capture_output=True, text=True, timeout=25).stdout
+        out = subprocess.run(["avahi-browse", "-atrp"], capture_output=True, timeout=25).stdout
+        out = out.decode("utf-8", "replace")
     except subprocess.TimeoutExpired as e:
         out = e.stdout or ""
         if isinstance(out, bytes):
             out = out.decode("utf-8", "replace")
+    except OSError:
+        out = ""
     return analyser_avahi(out)
 
 
@@ -209,7 +212,7 @@ def etape_appletv(cfg):
     if not a_remplir(atv.get("identifier")) and not oui("Apple TV déjà configurée. La refaire ?", False):
         return
     print("Recherche des Apple TV…")
-    out = subprocess.run([atvremote, "scan"], capture_output=True, text=True, timeout=60).stdout
+    out = subprocess.run([atvremote, "scan"], capture_output=True, text=True, errors="replace", timeout=60).stdout
     appareils = []
     for bloc in out.split("\n\n"):
         nom = re.search(r"Name:\s*(.+)", bloc)
@@ -228,7 +231,7 @@ def etape_appletv(cfg):
     for proto in ("companion", "airplay"):
         print(f"\n{B}Appairage {proto}{X} : un code va s'afficher sur la TV, tape-le ici.")
         subprocess.run([atvremote, "--id", ident, "--protocol", proto, "pair"])
-    out = subprocess.run([atvremote, "--id", ident, "app_list"], capture_output=True, text=True, timeout=60).stdout
+    out = subprocess.run([atvremote, "--id", ident, "app_list"], capture_output=True, text=True, errors="replace", timeout=60).stdout
     qobuz = [b for n, b in re.findall(r"App:\s*([^,(]+?)\s*\(([^)]+)\)", out) if "qobuz" in n.lower() or "qobuz" in b.lower()]
     if qobuz:
         atv["qobuz_bundle_id"] = qobuz[0]
