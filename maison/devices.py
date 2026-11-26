@@ -241,7 +241,16 @@ class AppleTV:
             return self._run(go())
 
     def power(self, on):
-        return self.call(lambda a: a.power.turn_on() if on else a.power.turn_off())
+        async def go(a):
+            from pyatv.const import FeatureName, FeatureState
+            feat = FeatureName.TurnOn if on else FeatureName.TurnOff
+            if a.features.in_state(FeatureState.Available, feat):
+                return await (a.power.turn_on() if on else a.power.turn_off())
+            if on:
+                # Sans le protocole Companion : un appui sur Accueil réveille aussi l'Apple TV
+                return await a.remote_control.home()
+            raise RuntimeError("extinction impossible : appaire le protocole Companion (voir README)")
+        return self.call(go)
 
     def key(self, k):
         keys = {
@@ -254,7 +263,12 @@ class AppleTV:
         return self.call(lambda a: getattr(a.remote_control, keys[k])())
 
     def launch(self, bundle_id):
-        return self.call(lambda a: a.apps.launch_app(bundle_id))
+        async def go(a):
+            from pyatv.const import FeatureName, FeatureState
+            if not a.features.in_state(FeatureState.Available, FeatureName.LaunchApp):
+                raise RuntimeError("ouverture de Qobuz impossible : appaire le protocole Companion (voir README)")
+            return await a.apps.launch_app(bundle_id)
+        return self.call(go)
 
 
 # ----------------------------------------------------------------- Podcasts
