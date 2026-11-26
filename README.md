@@ -32,11 +32,16 @@ cd maison-facile
 L'installation met en place Qt, l'environnement Python, le démarrage automatique sur
 l'écran et la baisse de luminosité au repos.
 
-## 2. Configurer `config.json`
+## 2. Configurer
+
+Le plus simple : l'assistant trouve les appareils sur le réseau, appaire la Hue et
+l'Apple TV, récupère les stores et les préréglages Qobuz, puis écrit `config.json`.
 
 ```bash
-nano config.json
+.venv/bin/python configurer.py
 ```
+
+Pour régler à la main (ou ajouter des radios et podcasts) : `nano config.json`.
 
 - **Denon / WiiM / pont Hue / Homey** : leur adresse IP (idéalement fixée dans la box).
   `max_volume` empêche un volume trop fort.

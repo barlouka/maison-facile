@@ -5,7 +5,7 @@ DIR="$(cd "$(dirname "$0")" && pwd)"
 
 echo "→ Paquets Qt (interface native)…"
 sudo apt-get update
-sudo apt-get install -y python3-venv qt6-wayland fonts-inter \
+sudo apt-get install -y python3-venv avahi-utils qt6-wayland fonts-inter \
   qml6-module-qtquick qml6-module-qtquick-window qml6-module-qtquick-shapes \
   || true
 QT_OK=1
@@ -48,5 +48,5 @@ sudo raspi-config nonint do_blanking 1 || true
 sudo raspi-config nonint do_boot_behaviour B4 || true
 
 echo
-echo "✓ Installé. Remplis config.json, puis : sudo reboot"
+echo "✓ Installé. Configure avec : .venv/bin/python configurer.py"
 echo "  (pour tester tout de suite : $DIR/lancer.sh)"
