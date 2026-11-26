@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Maison">
+<meta name="theme-color" content="#111214">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon.png">
+<title>Maison</title>
+<style>
+  :root {
+    --bg: #111214; --card: #1c1d21; --card2: #26282d; --text: #f3f1ec; --muted: #8d8f96;
+    --accent: #e8a34a; --ok: #6fcf97; --danger: #e5675a; --r: 20px;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text);
+    font: 17px/1.3 -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+    -webkit-user-select: none; user-select: none; }
+  body { display: flex; flex-direction: column;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left); }
+
+  header { display: flex; align-items: baseline; justify-content: space-between; padding: 18px 20px 6px; }
+  header h1 { margin: 0; font-size: 30px; font-weight: 700; letter-spacing: -0.5px; }
+  #now { color: var(--muted); font-size: 15px; text-align: right; max-width: 60%;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  nav { display: flex; gap: 8px; padding: 10px 20px; overflow-x: auto; }
+  nav button { flex: 1; min-width: 84px; padding: 12px 10px; border: 0; border-radius: 14px;
+    background: var(--card); color: var(--muted); font: inherit; font-weight: 600; }
+  nav button.on { background: var(--text); color: var(--bg); }
+
+  main { flex: 1; overflow-y: auto; padding: 8px 20px 20px; -webkit-overflow-scrolling: touch; }
+  section { display: none; }
+  section.on { display: block; }
+  h2 { font-size: 14px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted);
+    font-weight: 600; margin: 22px 0 10px; }
+  h2:first-child { margin-top: 6px; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+  .tile { border: 0; border-radius: var(--r); background: var(--card); color: var(--text);
+    font: inherit; font-weight: 600; padding: 22px 16px; min-height: 92px; text-align: left;
+    display: flex; flex-direction: column; justify-content: space-between; gap: 8px;
+    transition: transform .08s, background .2s; }
+  .tile:active { transform: scale(.97); background: var(--card2); }
+  .tile small { color: var(--muted); font-weight: 500; font-size: 14px; }
+  .tile.big { grid-column: 1 / -1; min-height: 110px; font-size: 21px;
+    background: linear-gradient(135deg, #2b2418, #1c1d21); }
+  .tile.big small { color: var(--accent); }
+
+  .list .row { display: flex; align-items: center; gap: 14px; background: var(--card);
+    border-radius: 16px; padding: 14px 16px; margin-bottom: 8px; }
+  .row .t { flex: 1; min-width: 0; }
+  .row .t div { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .row .t small { color: var(--muted); }
+  .play { border: 0; width: 48px; height: 48px; border-radius: 50%; background: var(--text);
+    color: var(--bg); font-size: 18px; flex: none; }
+
+  /* Lumières */
+  .room { background: var(--card); border-radius: var(--r); padding: 16px; margin-bottom: 12px; }
+  .room .top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+  .room .name { font-weight: 600; font-size: 19px; }
+  .switch { width: 64px; height: 36px; border-radius: 18px; border: 0; background: var(--card2); position: relative; }
+  .switch::after { content: ""; position: absolute; top: 4px; left: 4px; width: 28px; height: 28px;
+    border-radius: 50%; background: var(--muted); transition: .2s; }
+  .switch.on { background: var(--accent); }
+  .switch.on::after { left: 32px; background: #fff; }
+  input[type=range] { width: 100%; height: 44px; -webkit-appearance: none; appearance: none; background: transparent; }
+  input[type=range]::-webkit-slider-runnable-track { height: 10px; border-radius: 5px; background: var(--card2); }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 30px; height: 30px; margin-top: -10px;
+    border-radius: 50%; background: #fff; }
+
+  /* Stores */
+  .store { display: flex; align-items: center; gap: 10px; background: var(--card); border-radius: var(--r);
+    padding: 14px 16px; margin-bottom: 10px; }
+  .store .name { flex: 1; font-weight: 600; font-size: 18px; }
+  .store button { width: 58px; height: 52px; border-radius: 14px; border: 0; background: var(--card2);
+    color: var(--text); font-size: 22px; }
+  .store button:active { background: var(--accent); color: var(--bg); }
+
+  /* Télécommande Apple TV */
+  .remote { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; max-width: 360px; margin: 0 auto; }
+  .remote button { border: 0; border-radius: 22px; background: var(--card); color: var(--text);
+    font: inherit; font-size: 24px; height: 84px; }
+  .remote button:active { background: var(--card2); }
+  .remote .ok { background: var(--card2); font-size: 17px; font-weight: 700; }
+  .remote .lbl { font-size: 15px; font-weight: 600; }
+
+  /* Barre du bas */
+  footer { display: flex; align-items: center; gap: 10px; padding: 12px 20px calc(12px + env(safe-area-inset-bottom));
+    background: #0b0c0d; border-top: 1px solid #222; }
+  footer button { border: 0; border-radius: 14px; background: var(--card); color: var(--text);
+    font: inherit; font-weight: 700; height: 52px; min-width: 56px; font-size: 22px; }
+  #vol { flex: 1; text-align: center; }
+  #vol b { font-size: 24px; display: block; }
+  #vol small { color: var(--muted); font-size: 12px; }
+  #mute.on { background: var(--danger); }
+  #off { background: #2a1714; color: var(--danger); font-size: 15px; padding: 0 14px; }
+
+  #toast { position: fixed; left: 50%; bottom: 110px; transform: translateX(-50%) translateY(20px);
+    background: #2d2f34; color: var(--text); padding: 12px 18px; border-radius: 14px; font-size: 15px;
+    opacity: 0; transition: .25s; pointer-events: none; max-width: 90%; text-align: center; z-index: 5; }
+  #toast.show { opacity: 1; transform: translateX(-50%); }
+  #toast.err { background: #4a1f1a; }
+
+  /* Horloge au repos (iPad) */
+  #clock { position: fixed; inset: 0; background: #000; display: none; flex-direction: column;
+    align-items: center; justify-content: center; z-index: 10; }
+  #clock.show { display: flex; }
+  #clock .h { font: 200 min(30vw, 46vh)/1 -apple-system, "SF Pro Rounded", system-ui;
+    color: #f5a742; letter-spacing: -4px; font-variant-numeric: tabular-nums; }
+  #clock .d { margin-top: 2vh; color: #6c6c72; font-size: min(5vw, 4.5vh); font-weight: 500; }
+  #clock .d::first-letter { text-transform: uppercase; }
+  #clock .s { color: #3a3a3e; margin-top: 4vh; font-size: 14px; }
+</style>
+</head>
+<body>
+<header>
+  <h1 id="title">Maison</h1>
+  <div id="now"></div>
+</header>
+
+<nav>
+  <button data-tab="music" class="on">Musique</button>
+  <button data-tab="tv">TV</button>
+  <button data-tab="lights">Lumières</button>
+  <button data-tab="stores">Stores</button>
+</nav>
+
+<main>
+  <section id="music" class="on">
+    <h2 id="h-presets">Qobuz</h2>
+    <div class="grid" id="presets"></div>
+    <h2 id="h-radios">Radio</h2>
+    <div class="grid" id="radios"></div>
+    <h2 id="h-podcasts">Podcasts</h2>
+    <div class="grid" id="podcasts"></div>
+    <div class="list" id="episodes"></div>
+    <h2>Lecture</h2>
+    <div class="grid">
+      <button class="tile" onclick="api('wiim/pause')">⏯ Pause / reprise</button>
+      <button class="tile" onclick="api('wiim/stop')">⏹ Arrêter</button>
+    </div>
+  </section>
+
+  <section id="tv">
+    <div class="grid">
+      <button class="tile big" onclick="watch(false)">Apple TV<small>Allume tout et met la bonne entrée</small></button>
+      <button class="tile" id="qobuz-atv" onclick="watch(true)">Qobuz sur la TV<small>Ouvre l'app Qobuz</small></button>
+    </div>
+    <h2>Télécommande</h2>
+    <div class="remote">
+      <button class="lbl" onclick="key('menu')">Retour</button>
+      <button onclick="key('up')">▲</button>
+      <button class="lbl" onclick="key('home')">Accueil</button>
+      <button onclick="key('left')">◀</button>
+      <button class="ok" onclick="key('select')">OK</button>
+      <button onclick="key('right')">▶</button>
+      <button onclick="key('previous')">⏮</button>
+      <button onclick="key('down')">▼</button>
+      <button onclick="key('next')">⏭</button>
+      <span></span>
+      <button onclick="key('playpause')">⏯</button>
+      <span></span>
+    </div>
+  </section>
+
+  <section id="lights">
+    <div class="grid" style="margin-bottom:14px">
+      <button class="tile" onclick="api('lights/off').then(refresh)">Tout éteindre<small>Toutes les lumières</small></button>
+    </div>
+    <div id="rooms"></div>
+  </section>
+
+  <section id="stores">
+    <div id="storelist"></div>
+  </section>
+</main>
+
+<footer>
+  <button onclick="vol(-1)" aria-label="Baisser">−</button>
+  <div id="vol"><b>–</b><small>Volume</small></div>
+  <button onclick="vol(1)" aria-label="Monter">+</button>
+  <button id="mute" onclick="mute()" aria-label="Couper le son">🔇</button>
+  <button id="off" onclick="allOff()">Tout<br>éteindre</button>
+</footer>
+
+<div id="toast"></div>
+<div id="clock"><div class="h">--:--</div><div class="d"></div><div class="s">Touchez l'écran</div></div>
+
+<script>
+let CONF = {}, STATE = {};
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function toast(msg, err) {
+  const t = $("#toast"); t.textContent = msg; t.className = "show" + (err ? " err" : "");
+  clearTimeout(t._h); t._h = setTimeout(() => t.className = "", err ? 4000 : 1600);
+}
+
+async function api(path, body) {
+  try {
+    const r = await fetch("/api/" + path, {
+      method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(body || {})
+    });
+    const j = await r.json();
+    if (!r.ok) throw new Error(j.error || r.status);
+    return j;
+  } catch (e) { toast("Oups : " + e.message, true); throw e; }
+}
+async function get(path) {
+  const r = await fetch("/api/" + path); const j = await r.json();
+  if (!r.ok) throw new Error(j.error || r.status); return j;
+}
+
+// Onglets
+document.querySelectorAll("nav button").forEach(b => b.onclick = () => {
+  document.querySelectorAll("nav button, section").forEach(x => x.classList.remove("on"));
+  b.classList.add("on"); $("#" + b.dataset.tab).classList.add("on");
+  if (b.dataset.tab === "lights") refresh();
+});
+
+function tile(label, sub, onclick) {
+  const b = document.createElement("button"); b.className = "tile";
+  b.innerHTML = esc(label) + (sub ? `<small>${esc(sub)}</small>` : ""); b.onclick = onclick; return b;
+}
+
+async function playing(p, label) { try { await p; toast("▶ " + label); setTimeout(refresh, 1500); } catch {} }
+
+function buildMusic() {
+  const pr = $("#presets"); pr.innerHTML = "";
+  (CONF.presets || []).forEach(p => pr.append(tile(p.name, p.sub || "Qobuz", () => playing(api("preset", {preset: p.preset}), p.name))));
+  $("#h-presets").style.display = pr.children.length ? "" : "none";
+
+  const ra = $("#radios"); ra.innerHTML = "";
+  (CONF.radios || []).forEach((r, i) => ra.append(tile(r.name, r.sub || "Radio", () => playing(api("radio", {index: i}), r.name))));
+  $("#h-radios").style.display = ra.children.length ? "" : "none";
+
+  const po = $("#podcasts"); po.innerHTML = "";
+  (CONF.podcasts || []).forEach(p => po.append(tile(p.name, "Derniers épisodes", () => episodes(p))));
+  $("#h-podcasts").style.display = po.children.length ? "" : "none";
+}
+
+async function episodes(p) {
+  const box = $("#episodes"); box.innerHTML = `<div class="row"><div class="t"><small>Chargement…</small></div></div>`;
+  try {
+    const eps = await get("podcast?i=" + p.index);
+    box.innerHTML = `<h2>${esc(p.name)}</h2>`;
+    eps.forEach(e => {
+      const row = document.createElement("div"); row.className = "row";
+      row.innerHTML = `<div class="t"><div>${esc(e.title)}</div><small>${esc(e.date)}</small></div><button class="play">▶</button>`;
+      row.querySelector("button").onclick = () => playing(api("listen", {url: e.url}), e.title);
+      box.append(row);
+    });
+  } catch (e) { box.innerHTML = ""; toast("Podcast indisponible", true); }
+}
+
+function buildStores() {
+  const box = $("#storelist"); box.innerHTML = "";
+  const all = [{name: "Tous les stores", id: "all"}, ...(CONF.stores || [])];
+  if (all.length === 1) { box.innerHTML = `<p style="color:var(--muted)">Aucun store configuré.</p>`; return; }
+  all.forEach(s => {
+    const row = document.createElement("div"); row.className = "store";
+    row.innerHTML = `<div class="name">${esc(s.name)}</div><button>▲</button><button>■</button><button>▼</button>`;
+    const [u, st, d] = row.querySelectorAll("button");
+    u.onclick = () => api("store", {id: s.id, action: "up"}).then(() => toast("▲ " + s.name));
+    st.onclick = () => api("store", {id: s.id, action: "idle"}).then(() => toast("■ " + s.name));
+    d.onclick = () => api("store", {id: s.id, action: "down"}).then(() => toast("▼ " + s.name));
+    box.append(row);
+  });
+}
+
+function buildRooms(rooms) {
+  const box = $("#rooms");
+  if (!Array.isArray(rooms)) { box.innerHTML = `<p style="color:var(--muted)">Lumières injoignables.</p>`; return; }
+  if (box._busy) return;
+  box.innerHTML = "";
+  rooms.forEach(r => {
+    const el = document.createElement("div"); el.className = "room";
+    el.innerHTML = `<div class="top"><div class="name">${esc(r.name)}</div><button class="switch ${r.on ? "on" : ""}"></button></div>
+      <input type="range" min="1" max="254" value="${r.bri}">`;
+    const sw = el.querySelector(".switch"), sl = el.querySelector("input");
+    sw.onclick = () => { const on = !sw.classList.contains("on"); sw.classList.toggle("on", on); api("lights/room", {id: r.id, on}); };
+    sl.oninput = () => { box._busy = true; sw.classList.add("on"); };
+    sl.onchange = () => { api("lights/room", {id: r.id, bri: +sl.value}); setTimeout(() => box._busy = false, 1500); };
+    box.append(el);
+  });
+}
+
+// Volume (Denon)
+function showVol() {
+  const d = STATE.denon || {};
+  $("#vol b").textContent = d.error ? "!" : (d.power ? (d.volume ?? "–") : "Éteint");
+  $("#mute").classList.toggle("on", !!d.mute);
+}
+let volTimer;
+function vol(step) {
+  const d = STATE.denon || {};
+  if (typeof d.volume === "number") { d.volume = Math.max(0, Math.min(d.max_volume || 70, d.volume + step)); showVol(); }
+  api("denon/volume", {step});
+  clearTimeout(volTimer); volTimer = setTimeout(refresh, 1200);
+}
+function mute() { const on = !(STATE.denon || {}).mute; (STATE.denon ||= {}).mute = on; showVol(); api("denon/mute", {on}); }
+
+async function watch(qobuz) { try { await api("appletv/watch", {qobuz}); toast("Apple TV prête"); } catch {} }
+function key(k) { api("appletv/key", {key: k}); if (navigator.vibrate) navigator.vibrate(10); }
+
+async function allOff() {
+  if (!confirm("Tout éteindre (musique, TV, ampli, lumières) ?")) return;
+  try { await api("off"); toast("Bonne nuit 🌙"); setTimeout(refresh, 2000); } catch {}
+}
+
+async function refresh() {
+  try {
+    STATE = await get("status");
+    showVol();
+    const w = STATE.wiim || {};
+    $("#now").textContent = w.state === "play" && w.title ? "♪ " + w.title : "";
+    buildRooms(STATE.lights);
+  } catch {}
+}
+
+// Horloge au repos
+let idle;
+function tick() {
+  const n = new Date();
+  $("#clock .h").textContent = n.toLocaleTimeString("fr-CH", {hour: "2-digit", minute: "2-digit"});
+  $("#clock .d").textContent = n.toLocaleDateString("fr-CH", {weekday: "long", day: "numeric", month: "long"});
+}
+function wake(e) {
+  const c = $("#clock");
+  if (c.classList.contains("show")) { c.classList.remove("show"); e && e.preventDefault(); refresh(); }
+  clearTimeout(idle);
+  if (CONF.idle_seconds > 0) idle = setTimeout(() => { tick(); c.classList.add("show"); }, CONF.idle_seconds * 1000);
+}
+["pointerdown", "keydown"].forEach(ev => document.addEventListener(ev, wake, true));
+setInterval(() => { if ($("#clock").classList.contains("show")) tick(); }, 10000);
+
+(async function init() {
+  try { CONF = await get("config"); } catch { toast("Serveur injoignable", true); return; }
+  $("#title").textContent = CONF.title || "Maison"; document.title = CONF.title || "Maison";
+  if (!CONF.qobuz) $("#qobuz-atv").style.display = "none";
+  buildMusic(); buildStores(); refresh(); wake();
+  setInterval(() => { if (!document.hidden && !$("#clock").classList.contains("show")) refresh(); }, 8000);
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) refresh(); });
+})();
+</script>
+</body>
+</html>
