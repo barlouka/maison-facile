@@ -304,6 +304,20 @@ def podcast_episodes(rss, n=8):
     return eps
 
 
+# ----------------------------------------------------------------- Écran tactile du Pi
+def set_backlight(bright, dim_percent=8):
+    """Règle le rétroéclairage de l'écran officiel (s'il existe)."""
+    import glob
+    for d in glob.glob("/sys/class/backlight/*"):
+        try:
+            mx = int(open(os.path.join(d, "max_brightness")).read())
+            val = mx if bright else max(1, mx * dim_percent // 100)
+            with open(os.path.join(d, "brightness"), "w") as f:
+                f.write(str(val))
+        except OSError:
+            pass
+
+
 # ----------------------------------------------------------------- Application
 class House:
     def __init__(self, cfg):
@@ -374,7 +388,7 @@ class House:
 HOUSE = None
 
 
-def route(method, path, q, body):
+def route(method, path, q, body, client=None):
     h = HOUSE
     b = body or {}
     if method == "GET":
@@ -428,6 +442,11 @@ def route(method, path, q, body):
             return {"ok": True}
         if path == "/api/off":
             h.everything_off(); return {"ok": True}
+        if path == "/api/screen":
+            # Seul l'écran branché sur le Pi (localhost) règle sa propre luminosité
+            if client in ("127.0.0.1", "::1"):
+                set_backlight(bool(b.get("on")), h.cfg.get("screen_dim_percent", 8))
+            return {"ok": True}
     raise KeyError(path)
 
 
@@ -458,7 +477,7 @@ class Handler(BaseHTTPRequestHandler):
                 n = int(self.headers.get("Content-Length") or 0)
                 body = json.loads(self.rfile.read(n) or b"{}")
             try:
-                self._send(200, route(method, u.path, urllib.parse.parse_qs(u.query), body))
+                self._send(200, route(method, u.path, urllib.parse.parse_qs(u.query), body, self.client_address[0]))
             except KeyError as e:
                 self._send(404, {"error": f"inconnu : {e}"})
             except Exception as e:

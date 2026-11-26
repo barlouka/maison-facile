@@ -106,7 +106,27 @@
   #toast.show { opacity: 1; transform: translateX(-50%); }
   #toast.err { background: #4a1f1a; }
 
-  /* Horloge au repos (iPad) */
+  /* Écran tactile du Pi / petits écrans en paysage : onglets à gauche */
+  @media (orientation: landscape) and (max-height: 620px) {
+    body { display: grid; grid-template-columns: 170px 1fr; grid-template-rows: auto 1fr auto;
+      grid-template-areas: "head main" "nav main" "foot foot"; }
+    header { grid-area: head; flex-direction: column; align-items: flex-start; padding: 16px 14px 4px; gap: 4px; }
+    header h1 { font-size: 24px; }
+    #now { max-width: 100%; text-align: left; font-size: 13px; }
+    nav { grid-area: nav; flex-direction: column; padding: 8px 14px; overflow: visible; }
+    nav button { flex: none; text-align: left; padding: 15px 14px; font-size: 18px; }
+    main { grid-area: main; padding: 14px 16px 14px 4px; }
+    footer { grid-area: foot; padding: 8px 14px; }
+    footer button { height: 50px; }
+    .tile { min-height: 78px; padding: 16px 14px; }
+    .tile.big { min-height: 86px; }
+    .grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+    .remote { max-width: 300px; gap: 8px; }
+    .remote button { height: 62px; }
+    h2 { margin: 16px 0 8px; }
+  }
+
+  /* Horloge au repos (iPad, écran du Pi) */
   #clock { position: fixed; inset: 0; background: #000; display: none; flex-direction: column;
     align-items: center; justify-content: center; z-index: 10; }
   #clock.show { display: flex; }
@@ -323,7 +343,9 @@ async function refresh() {
   } catch {}
 }
 
-// Horloge au repos
+// Horloge au repos (sur l'écran du Pi, la luminosité baisse aussi)
+const LOCAL = ["localhost", "127.0.0.1"].includes(location.hostname);
+function screen(on) { if (LOCAL) fetch("/api/screen", {method: "POST", body: JSON.stringify({on})}).catch(() => {}); }
 let idle;
 function tick() {
   const n = new Date();
@@ -332,9 +354,9 @@ function tick() {
 }
 function wake(e) {
   const c = $("#clock");
-  if (c.classList.contains("show")) { c.classList.remove("show"); e && e.preventDefault(); refresh(); }
+  if (c.classList.contains("show")) { c.classList.remove("show"); e && e.preventDefault(); screen(true); refresh(); }
   clearTimeout(idle);
-  if (CONF.idle_seconds > 0) idle = setTimeout(() => { tick(); c.classList.add("show"); }, CONF.idle_seconds * 1000);
+  if (CONF.idle_seconds > 0) idle = setTimeout(() => { tick(); c.classList.add("show"); screen(false); }, CONF.idle_seconds * 1000);
 }
 ["pointerdown", "keydown"].forEach(ev => document.addEventListener(ev, wake, true));
 setInterval(() => { if ($("#clock").classList.contains("show")) tick(); }, 10000);

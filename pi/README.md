@@ -84,6 +84,21 @@ L'app s'ouvre alors en plein écran, sans barre Safari.
 Pour l'iPad du salon : Réglages → Luminosité → Verrouillage auto → *Jamais*, et
 Accès guidé (Accessibilité) pour bloquer l'iPad sur l'app si tu veux.
 
+## 4. Sur l'écran tactile officiel du Pi (mode kiosque)
+
+```bash
+./kiosk.sh
+sudo reboot
+```
+
+Au démarrage, le Pi ouvre l'app en plein écran, sans barre ni curseur à gérer.
+En paysage, les onglets passent dans une colonne à gauche (prévu pour 800×480).
+Au repos, la grande horloge s'affiche **et la luminosité baisse** (réglable avec
+`"screen_dim_percent"` dans `config.json`, 8 % par défaut). Un toucher rallume tout.
+Seul l'écran du Pi baisse sa luminosité : l'iPhone ou l'iPad n'y touchent pas.
+
+Pour sortir du kiosque : clavier branché puis `Alt+F4`.
+
 ## Bon à savoir
 
 - Tout reste à la maison : rien ne passe par Internet (sauf la musique elle-même).
