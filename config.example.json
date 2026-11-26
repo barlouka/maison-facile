@@ -48,6 +48,26 @@
       "name": "Option Musique",
       "sub": "RTS",
       "url": "http://stream.srg-ssr.ch/m/option-musique/mp3_128"
+    },
+    {
+      "name": "Rhône FM",
+      "sub": "Valais",
+      "url": "https://rhonefm.ice.infomaniak.ch/rhonefm-high.mp3"
+    },
+    {
+      "name": "Europe 1",
+      "sub": "France",
+      "url": "https://europe1.lmn.fm/europe1.mp3"
+    },
+    {
+      "name": "RTL",
+      "sub": "France",
+      "url": "https://icecast.rtl.fr/rtl-1-44-128"
+    },
+    {
+      "name": "Swiss Pop",
+      "sub": "Radio Swiss",
+      "url": "http://stream.srg-ssr.ch/m/rsp/mp3_128"
     }
   ],
   "podcasts": [
