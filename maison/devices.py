@@ -304,7 +304,7 @@ def set_backlight(bright, dim_percent=8):
     for d in glob.glob("/sys/class/backlight/*"):
         try:
             mx = int(open(os.path.join(d, "max_brightness")).read())
-            val = mx if bright else max(1, mx * dim_percent // 100)
+            val = mx if bright else (0 if dim_percent <= 0 else max(1, mx * dim_percent // 100))
             with open(os.path.join(d, "brightness"), "w") as f:
                 f.write(str(val))
         except OSError:

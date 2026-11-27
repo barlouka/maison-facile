@@ -74,7 +74,9 @@ Puis `sudo reboot` : l'app démarre toute seule en plein écran.
 | Mettre à jour | `git pull` puis `./lancer.sh` |
 
 Options de `config.json` : `idle_seconds` (délai avant l'horloge, 0 = jamais),
-`screen_dim_percent` (luminosité au repos), `hide_cursor`, `fullscreen`.
+`screen_dim_percent` (luminosité au repos, 0 = écran éteint), `hide_cursor`, `fullscreen`,
+`camera` (`enabled` : l'écran se rallume quand quelqu'un s'approche ; `sensitivity` : 0.02 par défaut,
+plus petit = plus sensible). Aucune image n'est enregistrée ni envoyée.
 
 ## Organisation du code
 

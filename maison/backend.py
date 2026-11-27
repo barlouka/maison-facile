@@ -22,6 +22,7 @@ class Backend(QObject):
     _toastIn = Signal(str, bool)
     _episodesIn = Signal(int, object)
     _stoppedIn = Signal()
+    _motionIn = Signal()
 
     def __init__(self, cfg):
         super().__init__()
@@ -37,6 +38,7 @@ class Backend(QObject):
         self._toastIn.connect(self.toast, q)
         self._episodesIn.connect(self._emitEpisodes, q)
         self._stoppedIn.connect(self.stopped, q)
+        self._motionIn.connect(self._onMotion, q)
 
         self._poll = QTimer(self)
         self._poll.setInterval(8000)
@@ -49,6 +51,14 @@ class Backend(QObject):
         self._dim = int(cfg.get("screen_dim_percent", 8))
         self.activity()
         self.refresh()
+
+        # Caméra : quelqu'un s'approche → l'écran se rallume (et reste allumé tant que ça bouge)
+        self._presence = None
+        cam = cfg.get("camera", {})
+        if cam.get("enabled"):
+            from .presence import PresenceWatcher
+            self._presence = PresenceWatcher(cam, self._motionIn.emit)
+            self._presence.start()
 
     # ---------------------------------------------------------------- propriétés
     def _getConfig(self):
@@ -193,12 +203,18 @@ class Backend(QObject):
             self._idleTimer.start(self._idleSeconds * 1000)
         return woke
 
+    @Slot()
+    def _onMotion(self):
+        self.activity()
+
     def _goIdle(self):
         self._idle = True
         self.idleChanged.emit()
         self._pool.submit(lambda: set_backlight(False, self._dim))
 
     def shutdown(self):
+        if self._presence:
+            self._presence.stop()
         self._pool.shutdown(wait=False, cancel_futures=True)
         set_backlight(True, self._dim)
 

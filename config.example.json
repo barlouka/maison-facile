@@ -101,5 +101,9 @@
   "appletv": {
     "identifier": "À-REMPLIR-avec-atvremote-scan",
     "qobuz_bundle_id": "À-REMPLIR-avec-atvremote-app_list"
+  },
+  "camera": {
+    "enabled": true,
+    "sensitivity": 0.02
   }
 }

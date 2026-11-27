@@ -5,7 +5,7 @@ DIR="$(cd "$(dirname "$0")" && pwd)"
 
 echo "→ Paquets Qt (interface native)…"
 sudo apt-get update
-sudo apt-get install -y python3-venv avahi-utils qt6-wayland fonts-inter \
+sudo apt-get install -y python3-venv avahi-utils python3-picamera2 qt6-wayland fonts-inter \
   qml6-module-qtquick qml6-module-qtquick-window qml6-module-qtquick-shapes \
   || true
 QT_OK=1
