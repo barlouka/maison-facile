@@ -15,7 +15,7 @@ sudo apt-get install -y python3-pyside6.qtcore python3-pyside6.qtgui python3-pys
 echo "→ Environnement Python…"
 python3 -m venv --system-site-packages "$DIR/.venv"
 "$DIR/.venv/bin/pip" install --upgrade pip >/dev/null
-"$DIR/.venv/bin/pip" install pyatv
+"$DIR/.venv/bin/pip" install pyatv "srptools==1.0.1"   # srptools récent : appairage Apple TV cassé
 if [ "$QT_OK" = "0" ] || ! "$DIR/.venv/bin/python" -c "import PySide6.QtQuick, PySide6.QtSvg" 2>/dev/null; then
   echo "→ PySide6 depuis pip (paquets apt indisponibles)…"
   "$DIR/.venv/bin/pip" install PySide6-Essentials
