@@ -44,7 +44,8 @@ l'Apple TV, récupère les stores et les préréglages Qobuz, puis écrit `confi
 Pour régler à la main (ou ajouter des radios et podcasts) : `nano config.json`.
 
 - **Denon / WiiM / pont Hue / Homey** : leur adresse IP (idéalement fixée dans la box).
-  `max_volume` empêche un volume trop fort.
+  `max_volume` empêche un volume trop fort. `inputs` indique sur quelle entrée du Denon
+  sont branchés l'Apple TV et le WiiM (codes : `SAT/CBL`, `BD`, `DVD`, `GAME`, `MPLAY`, `AUX1`, `TV`…).
 - **Préréglages Qobuz** : dans l'app **WiiM Home**, joue une playlist ou un album Qobuz,
   puis enregistre-le comme préréglage (1 à 12). Mets le même numéro dans `"preset"`.
 - **Hue** : `.venv/bin/python app.py --pair-hue` (appuie sur le bouton du pont quand demandé),

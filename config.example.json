@@ -6,7 +6,11 @@
   "screen_dim_percent": 8,
   "denon": {
     "host": "192.168.1.20",
-    "max_volume": 65
+    "max_volume": 65,
+    "inputs": {
+      "appletv": "SAT/CBL",
+      "mediaplayer": "MPLAY"
+    }
   },
   "wiim": {
     "host": "192.168.1.21",

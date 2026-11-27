@@ -34,6 +34,8 @@ class Denon:
         self.host = cfg.get("host")
         self.port = cfg.get("http_port", 8080)
         self.max_volume = cfg.get("max_volume", 70)
+        # Entrées personnalisables dans config.json, ex. "inputs": {"appletv": "BD"}
+        self.inputs = dict(self.INPUTS, **cfg.get("inputs", {}))
 
     def _cmd(self, code):
         url = f"http://{self.host}:{self.port}/goform/formiPhoneAppDirect.xml?{urllib.parse.quote(code, safe='/')}"
@@ -43,7 +45,7 @@ class Denon:
         self._cmd("PWON" if on else "PWSTANDBY")
 
     def source(self, name):
-        self._cmd("SI" + self.INPUTS.get(name, name))
+        self._cmd("SI" + self.inputs.get(name, name))
 
     def volume_step(self, up):
         # Un appui = 1 point de volume (le Denon avance par demi-points)
